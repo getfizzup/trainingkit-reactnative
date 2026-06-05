@@ -1,0 +1,9 @@
+.idea
+.DS_Store
+android/.gradle
+android/build
+android/local.properties
+ios/Vendor/TrainingKit.xcframework
+sample/.env
+sample/graphql
+node_modules

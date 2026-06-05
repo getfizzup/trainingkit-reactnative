@@ -1,0 +1,6 @@
+<resources>
+    <color name="sample_background">#000000</color>
+    <color name="sample_surface">#1C1C1E</color>
+    <color name="sample_primary_text">#FFFFFF</color>
+    <color name="sample_secondary_text">#A1A1AA</color>
+</resources>

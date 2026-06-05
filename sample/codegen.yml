@@ -1,0 +1,26 @@
+###############################################################################
+#
+#   CODE GENERATOR
+#       https://www.graphql-code-generator.com/docs/getting-started/index
+#
+###############################################################################
+overwrite: true
+schema:
+  - 'https://cloud.demo.fizzup.com/graphql':
+      headers:
+        'X-Developer-Authorization-Key': ${CLOUD_DEVELOPER_KEY}
+        'X-Apollo-Operation-Name': 'IntrospectionQuery'
+documents: './src/graphql/**/*.graphql'
+generates:
+  graphql/types.ts:
+    config:
+      avoidOptionals: false
+      useImplementingTypes: true
+      useTypeImports: true
+    plugins:
+      - typescript
+      - typescript-operations
+      - typed-document-node
+  graphql/schema.json:
+    plugins:
+      - 'introspection'

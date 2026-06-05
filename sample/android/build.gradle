@@ -1,0 +1,66 @@
+buildscript {
+    ext {
+        buildToolsVersion = "36.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 36
+        targetSdkVersion = 36
+        ndkVersion = "27.1.12297006"
+        kotlinVersion = "2.1.20"
+    }
+    Properties properties = new Properties()
+    def file = file("local.properties")
+    if (file) {
+        if (file.canRead()) {
+            properties.load(new FileInputStream(file))
+        }
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://maven.pkg.github.com/getfizzup/trainingkit-android-sdk"
+            credentials {
+                username = properties.getProperty("GithubUser") ?: System.getenv("GITHUB_USERNAME")
+                password = properties.getProperty("GithubToken") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.13.2")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    }
+}
+
+allprojects {
+    repositories {
+        maven {
+            // All of React Native (JS, Android binaries) is installed from npm
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
+
+        google()
+        mavenCentral()
+
+        Properties properties = new Properties()
+        def propertiesFile = project.rootProject.file('local.properties')
+        if (propertiesFile.exists()) {
+            properties.load(propertiesFile.newDataInputStream())
+        }
+
+        maven {
+            url "https://maven.pkg.github.com/getfizzup/trainingkit-android-sdk"
+            credentials {
+                username = properties.getProperty("GithubUser") ?: System.getenv("GITHUB_USERNAME")
+                password = properties.getProperty("GithubToken") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"

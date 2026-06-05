@@ -1,0 +1,32 @@
+{
+  "name": "trainingkit-reactnative",
+  "version": "0.1.0",
+  "description": "React Native bridge for FizzUp TrainingKit.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "fetch:ios-trainingkit": "./scripts/fetch-ios-trainingkit.sh"
+  },
+  "files": [
+    "android",
+    "ios",
+    "!ios/Vendor/TrainingKit.xcframework",
+    "scripts",
+    "src",
+    "react-native.config.js",
+    "TrainingKitReactNative.podspec"
+  ],
+  "keywords": [
+    "react-native",
+    "trainingkit",
+    "fizzup"
+  ],
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

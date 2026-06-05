@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
+        <item name="sampleBackgroundColor">@color/sample_background</item>
+        <item name="sampleSurfaceColor">@color/sample_surface</item>
+        <item name="samplePrimaryTextColor">@color/sample_primary_text</item>
+        <item name="sampleSecondaryTextColor">@color/sample_secondary_text</item>
+    </style>
+
+</resources>

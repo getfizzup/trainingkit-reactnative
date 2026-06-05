@@ -1,0 +1,72 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.13.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.20")
+    }
+}
+
+apply plugin: "com.android.library"
+apply plugin: "org.jetbrains.kotlin.android"
+
+android {
+    namespace "com.fysiki.trainingkitreactnative"
+
+    compileSdkVersion rootProject.ext.has("compileSdkVersion") ? rootProject.ext.get("compileSdkVersion") : 36
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.has("minSdkVersion") ? rootProject.ext.get("minSdkVersion") : 24
+        targetSdkVersion rootProject.ext.has("targetSdkVersion") ? rootProject.ext.get("targetSdkVersion") : 36
+        buildConfigField "String", "CHROMECAST_RECEIVER_APPLICATION_ID", "\"${resolveChromecastReceiverApplicationId()}\""
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+
+    Properties properties = new Properties()
+    def propertiesFile = rootProject.file("local.properties")
+    if (propertiesFile.exists()) {
+        properties.load(propertiesFile.newDataInputStream())
+    }
+
+    maven {
+        url "https://maven.pkg.github.com/getfizzup/trainingkit-android-sdk"
+        credentials {
+            username = properties.getProperty("GithubUser") ?: findProperty("GithubUser") ?: System.getenv("GITHUB_USERNAME")
+            password = properties.getProperty("GithubToken") ?: findProperty("GithubToken") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android")
+    implementation("com.fysiki:trainingkit:v32.1")
+    implementation("com.google.android.gms:play-services-cast-framework:21.4.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("androidx.activity:activity-ktx:1.11.0")
+    implementation("androidx.core:core-ktx:1.17.0")
+}
+
+def resolveChromecastReceiverApplicationId() {
+    def localProperties = new Properties()
+    def localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(localPropertiesFile.newDataInputStream())
+    }
+
+    return (
+        localProperties.getProperty("chromecastReceiverApplicationId")
+            ?: findProperty("chromecastReceiverApplicationId")
+            ?: System.getenv("CHROMECAST_RECEIVER_APPLICATION_ID")
+            ?: ""
+    ).trim()
+}

@@ -1,0 +1,32 @@
+pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+plugins { id("com.facebook.react.settings")
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0' }
+
+def resolveNodeBinary() {
+    def explicitNodeBinary = System.getenv("NODE_BINARY")
+    if (explicitNodeBinary) {
+        return explicitNodeBinary
+    }
+
+    def process = new ProcessBuilder("/bin/zsh", "-lc", "command -v node")
+        .directory(rootDir.parentFile)
+        .redirectErrorStream(true)
+        .start()
+    def resolvedNodeBinary = process.inputStream.text.trim()
+    def exitCode = process.waitFor()
+    if (exitCode != 0 || !resolvedNodeBinary) {
+        throw new GradleException("Unable to resolve Node.js binary. Set NODE_BINARY to an absolute path.")
+    }
+
+    return resolvedNodeBinary
+}
+
+def nodeBinary = resolveNodeBinary()
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
+    ex.autolinkLibrariesFromCommand(
+        [nodeBinary, "node_modules/react-native/cli.js", "config"]
+    )
+}
+rootProject.name = 'TrainingKitReactNativeDemo'
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')

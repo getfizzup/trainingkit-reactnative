@@ -1,0 +1,9 @@
+{
+  "name": "TrainingKitReactNativeDemo",
+  "displayName": "TrainingKit React Native Demo",
+  "extra": {
+    "eas": {
+      "projectId": "c75367ad-6dc6-4629-9876-ca8c9cd355a7"
+    }
+  }
+}
