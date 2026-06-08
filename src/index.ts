@@ -1,4 +1,5 @@
-import { NativeModules } from 'react-native';
+import { NativeEventEmitter, NativeModules } from 'react-native';
+import type { EmitterSubscription } from 'react-native';
 
 type NativeTrainingKitModule = {
   deviceIdentifier(): string;
@@ -12,6 +13,22 @@ export type TrainingKitSession = {
   trainingKitToken: string;
   [key: string]: unknown;
 };
+
+/** Result data emitted when a workout is saved. Shape mirrors the native SDK's
+ * `SaveWorkoutState` (richer on iOS than on Android). */
+export type WorkoutSaveData = Record<string, unknown>;
+
+/** Listeners for the workout completion lifecycle. */
+export type WorkoutListeners = {
+  /** The workout finished and produced a result to persist. */
+  onSave?: (data: WorkoutSaveData) => void;
+  /** The user quit the workout without completing it. */
+  onQuit?: () => void;
+  /** A TrainingKit analytics event was emitted during the workout. */
+  onEvent?: (name: string, properties: Record<string, unknown>) => void;
+};
+
+const WORKOUT_EVENT = 'TrainingKitWorkoutEvent';
 
 const nativeModule = NativeModules.TrainingKitModule as NativeTrainingKitModule | undefined;
 
@@ -48,6 +65,49 @@ export function launchWorkout(session: TrainingKitSession): void {
   }
 
   throw new Error(`Unsupported TrainingKit session type: ${session.__typename ?? session.format ?? 'unknown'}.`);
+}
+
+/**
+ * Subscribes to the workout completion lifecycle.
+ *
+ * Add the listener before calling {@link launchWorkout} so no event is missed.
+ * Returns a subscription; call `.remove()` to stop listening.
+ */
+export function addWorkoutListener(listeners: WorkoutListeners): EmitterSubscription {
+  const emitter = new NativeEventEmitter(NativeModules.TrainingKitModule);
+
+  return emitter.addListener(WORKOUT_EVENT, (body: WorkoutEventBody) => {
+    switch (body.type) {
+      case 'save':
+        listeners.onSave?.(parseJson(body.data));
+        return;
+      case 'quit':
+        listeners.onQuit?.();
+        return;
+      case 'event':
+        listeners.onEvent?.(body.name ?? '', parseJson(body.properties));
+        return;
+    }
+  });
+}
+
+type WorkoutEventBody = {
+  type: 'save' | 'quit' | 'event';
+  data?: string;
+  name?: string;
+  properties?: string;
+};
+
+function parseJson(value: string | undefined): Record<string, unknown> {
+  if (!value) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(value) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
 }
 
 function isClassicWorkout(session: TrainingKitSession): boolean {

@@ -1,9 +1,28 @@
 import TrainingKit
 import Foundation
 import UIKit
+import React
 
 @objc(TrainingKitModule)
-class TrainingKitModule: NSObject {
+class TrainingKitModule: RCTEventEmitter {
+  private var hasListeners = false
+
+  override func supportedEvents() -> [String]! {
+    ["TrainingKitWorkoutEvent"]
+  }
+
+  override static func requiresMainQueueSetup() -> Bool {
+    true
+  }
+
+  override func startObserving() {
+    hasListeners = true
+  }
+
+  override func stopObserving() {
+    hasListeners = false
+  }
+
   @objc
   func deviceIdentifier() -> String {
     TrainingKitConfig.deviceId()
@@ -19,6 +38,7 @@ class TrainingKitModule: NSObject {
     Task {
       do {
         let controller = try await ReactNativeClassicWorkoutController(data: data, token: token)
+        controller.onWorkoutEvent = { [weak self] body in self?.emit(body) }
         await present(controller)
       } catch {
         print("Failed to launch classic workout", error)
@@ -36,11 +56,17 @@ class TrainingKitModule: NSObject {
     Task {
       do {
         let controller = try await ReactNativeStreamingWorkoutController(data: data, token: token)
+        controller.onWorkoutEvent = { [weak self] body in self?.emit(body) }
         await present(controller)
       } catch {
         print("Failed to launch video workout", error)
       }
     }
+  }
+
+  private func emit(_ body: [String: Any]) {
+    guard hasListeners else { return }
+    sendEvent(withName: "TrainingKitWorkoutEvent", body: body)
   }
 
   @MainActor

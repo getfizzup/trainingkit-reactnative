@@ -11,6 +11,7 @@ import {
     View
 } from 'react-native'
 
+import {useEffect} from 'react'
 import {useLazyQuery, useQuery} from "@apollo/client/react";
 import {
     GetSessionContentDocument,
@@ -18,7 +19,7 @@ import {
     WorkoutFormat,
     WorkoutPreviewItemFragment
 } from "../../graphql/types.ts";
-import {launchWorkout as launchTrainingKit} from 'trainingkit-reactnative'
+import {addWorkoutListener, launchWorkout as launchTrainingKit} from 'trainingkit-reactnative'
 
 interface Section {
     title: string;
@@ -33,6 +34,15 @@ function formatDuration(seconds: number): string {
 
 function SessionsScreen() {
     const  { data, loading, error } = useQuery(GetSessionsDocument)
+
+    // Handle completion: react when a workout is saved or quit.
+    useEffect(() => {
+        const subscription = addWorkoutListener({
+            onSave: (workout) => Alert.alert('Séance enregistrée', `${Object.keys(workout).length} champs`),
+            onQuit: () => Alert.alert('Séance quittée'),
+        })
+        return () => subscription.remove()
+    }, [])
 
     const sessionsData: Section[] = [
         {

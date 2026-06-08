@@ -329,6 +329,35 @@ export function useWorkoutLauncher() {
 - classic session -> `launchClassicWorkout(JSON.stringify(session), session.trainingKitToken)`
 - video session -> `launchVideoWorkout(JSON.stringify(session), session.trainingKitToken)`
 
+## Handling Workout Completion
+
+Subscribe to the workout lifecycle with `addWorkoutListener` to react when a
+workout is saved or quit — for example to persist results to your backend.
+
+```ts
+import { addWorkoutListener } from 'trainingkit-reactnative'
+
+const subscription = addWorkoutListener({
+  onSave: (workout) => {
+    // The workout finished with a result. `workout` mirrors the native SDK's
+    // SaveWorkoutState (richer on iOS than on Android). Persist it here.
+  },
+  onQuit: () => {
+    // The user quit the workout without completing it.
+  },
+  onEvent: (name, properties) => {
+    // Optional: a TrainingKit analytics event.
+  },
+})
+
+// Stop listening when you no longer need it (e.g. on unmount):
+subscription.remove()
+```
+
+Add the listener **before** calling `launchWorkout` so no event is missed. The
+callbacks mirror the FizzUp Web SDK's `onWorkoutSave` / `onWorkoutQuit` /
+`onWorkoutEvent`.
+
 ## Building A Demo App From Scratch
 
 Create a new React Native app:

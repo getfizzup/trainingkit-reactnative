@@ -4,8 +4,12 @@ import HealthKit
 import TrainingKit
 
 class ReactNativeClassicWorkoutController: ClassicWorkoutController {
+  /// Forwards workout lifecycle events to the React Native bridge.
+  var onWorkoutEvent: (([String: Any]) -> Void)?
+
   var saveProm: AnyPublisher<Void, Never>?
   private var subscriptions = Set<AnyCancellable>()
+  private var didSave = false
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -22,11 +26,26 @@ class ReactNativeClassicWorkoutController: ClassicWorkoutController {
   override func saveSession(state: SaveWorkoutState) {
     super.saveSession(state: state)
 
+    didSave = true
+    onWorkoutEvent?(["type": "save", "data": TrainingKitEvent.encode(state)])
+
     saveProm = Future<Void, Never> { promise in
       DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
         promise(.success(()))
       }
     }.eraseToAnyPublisher()
+  }
+
+  override func quitWorkout() {
+    if !didSave {
+      onWorkoutEvent?(["type": "quit"])
+    }
+    super.quitWorkout()
+  }
+
+  override func trackEvent(_ name: Tracking.Event, properties: [Tracking.Property: String]? = nil) {
+    onWorkoutEvent?(TrainingKitEvent.event(name, properties))
+    super.trackEvent(name, properties: properties)
   }
 
   override func displayPostWorkout() -> AnyPublisher<Void, Never> {
