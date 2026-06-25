@@ -8,8 +8,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.fysiki.trainingkit.TrainingKit
-import com.fysiki.trainingkit.utils.DeviceIdHelper
+import com.fizzup.trainingkit.TrainingKit
+import com.fizzup.trainingkit.utils.DeviceIdHelper
 
 class TrainingKitModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     init {

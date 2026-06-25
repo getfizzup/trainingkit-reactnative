@@ -171,7 +171,7 @@ If your app was already using the old manual Android bridge, remove the manually
 - `VideoWorkoutActivity.kt`
 - `CastOptionsProvider.kt`
 - manual `add(TrainingKitReact())` in `MainApplication.kt`
-- direct app dependency `implementation("com.fysiki:trainingkit:v32.1")`, because the package declares it
+- direct app dependency `implementation("com.fizzup:trainingkit:v32.2")`, because the package declares it
 - manually declared TrainingKit activities from `AndroidManifest.xml`, because the package manifest declares them
 
 ## GraphQL Contract
@@ -526,12 +526,12 @@ The script uses `TRAININGKIT_IOS_SDK_URL` if you need to test a different archiv
 TRAININGKIT_IOS_SDK_URL=https://github.com/getfizzup/trainingkit-ios-sdk/archive/refs/heads/main.zip yarn fetch:ios-trainingkit
 ```
 
-### Android Cannot Resolve com.fysiki:trainingkit
+### Android Cannot Resolve com.fizzup:trainingkit
 
 If Android fails to resolve:
 
 ```text
-com.fysiki:trainingkit:v31
+com.fizzup:trainingkit:v32.2
 ```
 
 Check that the GitHub Packages Maven repository is configured and that credentials are available through `local.properties` or environment variables.
