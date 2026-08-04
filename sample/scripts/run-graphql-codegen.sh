@@ -2,6 +2,12 @@
 
 set -eu
 
+# Load .env into the shell so the checks below match graphql-codegen's dotenv behavior.
+if [ -f ".env" ]; then
+  set -a
+  . "./.env"
+  set +a
+fi
 if [ -z "${CLOUD_DEVELOPER_KEY:-}" ] && [ -f "android/local.properties" ]; then
   CLOUD_DEVELOPER_KEY="$(sed -n 's/^GraphQLAuthKey=//p' android/local.properties | head -n 1)"
   export CLOUD_DEVELOPER_KEY
