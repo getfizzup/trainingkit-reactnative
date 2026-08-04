@@ -6,7 +6,7 @@
 ###############################################################################
 overwrite: true
 schema:
-  - 'https://cloud.demo.fizzup.com/graphql':
+  - '${GRAPHQL_SERVER_URL}':
       headers:
         'X-Developer-Authorization-Key': ${CLOUD_DEVELOPER_KEY}
         'X-Apollo-Operation-Name': 'IntrospectionQuery'

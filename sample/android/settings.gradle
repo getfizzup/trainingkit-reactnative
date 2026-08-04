@@ -29,4 +29,6 @@ extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
 }
 rootProject.name = 'TrainingKitReactNativeDemo'
 include ':app'
+include ':trainingkit-reactnative-local'
+project(':trainingkit-reactnative-local').projectDir = new File(rootDir, '../../android')
 includeBuild('../node_modules/@react-native/gradle-plugin')

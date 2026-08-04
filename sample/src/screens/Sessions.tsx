@@ -20,6 +20,7 @@ import {
     WorkoutPreviewItemFragment
 } from "../../graphql/types.ts";
 import {addWorkoutListener, launchWorkout as launchTrainingKit} from 'trainingkit-reactnative'
+import type {TrainingKitSession} from 'trainingkit-reactnative'
 
 interface Section {
     title: string;
@@ -31,6 +32,12 @@ function formatDuration(seconds: number): string {
     return minutes.toString() + ' min'
 }
 
+function isLaunchableSession(session: unknown): session is TrainingKitSession {
+    return !!session
+        && typeof session === 'object'
+        && 'trainingKitToken' in session
+        && typeof session.trainingKitToken === 'string'
+}
 
 function SessionsScreen() {
     const  { data, loading, error } = useQuery(GetSessionsDocument)
@@ -66,9 +73,11 @@ function SessionsScreen() {
             // eslint-disable-next-line @typescript-eslint/no-shadow
             .then(({ data }) => {
                 const session = data?.publicWorkoutSession
-                if (session) {
+                if (isLaunchableSession(session)) {
                     launchTrainingKit(session)
+                    return
                 }
+                Alert.alert('Erreur', 'Cette séance ne peut pas être lancée avec TrainingKit.')
             })
             .catch((err) => {
                 Alert.alert('Erreur', err.message)
@@ -100,7 +109,7 @@ function SessionsScreen() {
     const renderItem = ({ item }: { item: WorkoutPreviewItemFragment }) => (
         <Pressable onPress={ () => launchWorkout(item.id)}>
             <View style={styles.cell}>
-                <Image source={{ uri: item.picture }} style={styles.cellImage} contentFit="cover" />
+                <Image source={{ uri: item.picture ?? undefined }} style={styles.cellImage} resizeMode="cover" />
                 <View style={styles.cellContent}>
                     <Text
                         style={{
@@ -145,6 +154,24 @@ function SessionsScreen() {
         return (
             <View style={styles.loader}>
                 <ActivityIndicator size="large" />
+            </View>
+        )
+    }
+
+    if (error) {
+        return (
+            <View style={styles.centerState}>
+                <Text style={styles.centerStateTitle}>Impossible de charger les séances</Text>
+                <Text style={styles.centerStateMessage}>{error.message}</Text>
+            </View>
+        )
+    }
+
+    if (sessionsData.every(section => section.data.length === 0)) {
+        return (
+            <View style={styles.centerState}>
+                <Text style={styles.centerStateTitle}>Aucune séance disponible</Text>
+                <Text style={styles.centerStateMessage}>La requête a réussi, mais aucun workout ne correspond au filtre demo.</Text>
             </View>
         )
     }
@@ -195,6 +222,49 @@ const styles = StyleSheet.create({
         paddingHorizontal: 36,
         paddingBottom: 8,
         paddingTop: 20,
+    },
+    centerState: {
+        flex: 1,
+        justifyContent: 'center' as const,
+        paddingHorizontal: 24,
+        ...Platform.select({
+            ios: {
+                backgroundColor: PlatformColor('systemBackground'),
+            },
+            android: {
+                backgroundColor: PlatformColor('?attr/sampleBackgroundColor'),
+            },
+            default: {
+                backgroundColor: '#FFFFFF',
+            },
+        }),
+    },
+    centerStateTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 8,
+        ...Platform.select({
+            ios: {
+                color: PlatformColor('label'),
+            },
+            android: {
+                color: PlatformColor('?attr/samplePrimaryTextColor'),
+            },
+            default: { color: '#111111' },
+        }),
+    },
+    centerStateMessage: {
+        fontSize: 15,
+        lineHeight: 22,
+        ...Platform.select({
+            ios: {
+                color: PlatformColor('secondaryLabel'),
+            },
+            android: {
+                color: PlatformColor('?attr/sampleSecondaryTextColor'),
+            },
+            default: { color: '#666666' },
+        }),
     },
     cell: {
         flexDirection: 'row',
