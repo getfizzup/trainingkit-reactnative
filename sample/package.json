@@ -9,8 +9,15 @@
     "start": "react-native start",
     "test": "jest",
     "pretty": "prettier --write ./src",
-    "prebuild": "graphql-codegen -r dotenv/config",
-    "generate": "graphql-codegen -r dotenv/config"
+    "preandroid": "node ./scripts/generate-graphql-config.js",
+    "preios": "node ./scripts/generate-graphql-config.js",
+    "prelint": "node ./scripts/generate-graphql-config.js",
+    "prestart": "node ./scripts/generate-graphql-config.js",
+    "pretest": "node ./scripts/generate-graphql-config.js",
+    "prebuild": "node ./scripts/generate-graphql-config.js && ./scripts/run-graphql-codegen.sh",
+    "pregenerate": "node ./scripts/generate-graphql-config.js",
+    "generate": "./scripts/run-graphql-codegen.sh",
+    "refresh-local-module": "./scripts/refresh-local-module.sh"
   },
   "dependencies": {
     "@apollo/client": "^4.1.2",

@@ -33,9 +33,8 @@ class TrainingKitModule(private val reactContext: ReactApplicationContext) : Rea
         val intent = Intent(reactContext, ClassicWorkoutActivity::class.java).apply {
             putExtra("jsonString", jsonString)
             putExtra("token", token)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        reactContext.startActivity(intent)
+        launchWorkoutActivity(intent)
     }
 
     @ReactMethod
@@ -43,9 +42,15 @@ class TrainingKitModule(private val reactContext: ReactApplicationContext) : Rea
         val intent = Intent(reactContext, VideoWorkoutActivity::class.java).apply {
             putExtra("jsonString", jsonString)
             putExtra("token", token)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        reactContext.startActivity(intent)
+        launchWorkoutActivity(intent)
+    }
+
+    private fun launchWorkoutActivity(intent: Intent) {
+        reactApplicationContext.currentActivity?.startActivity(intent) ?: run {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            reactContext.startActivity(intent)
+        }
     }
 
     // Required by NativeEventEmitter; the bookkeeping itself is handled in JS.

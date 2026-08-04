@@ -171,7 +171,7 @@ If your app was already using the old manual Android bridge, remove the manually
 - `VideoWorkoutActivity.kt`
 - `CastOptionsProvider.kt`
 - manual `add(TrainingKitReact())` in `MainApplication.kt`
-- direct app dependency `implementation("com.fizzup:trainingkit:v32.2")`, because the package declares it
+- direct app dependency `implementation("com.fizzup:trainingkit:v34")`, because the package declares it
 - manually declared TrainingKit activities from `AndroidManifest.xml`, because the package manifest declares them
 
 ## GraphQL Contract
@@ -231,6 +231,22 @@ export function App() {
 ```
 
 `deviceIdentifier()` is synchronous because the native SDK exposes a stable device id synchronously on both platforms.
+
+The demo app reads its GraphQL endpoint and developer key from local configuration before Metro bundles the app. Set either environment variables:
+
+```sh
+export GRAPHQL_SERVER_URL=https://cloud.demo.fizzup.com/graphql
+export CLOUD_DEVELOPER_KEY=your-developer-key
+```
+
+or add them to `sample/android/local.properties`:
+
+```properties
+GraphQLServerUrl=https://cloud.demo.fizzup.com/graphql
+GraphQLAuthKey=your-developer-key
+```
+
+`yarn android`, `yarn ios`, `yarn start`, `yarn test`, and `yarn lint` generate an ignored `sample/src/config/graphql.generated.ts` file from those values, so the same configuration path works for Android and iOS builds without committing secrets.
 
 ## Listing Workouts
 
