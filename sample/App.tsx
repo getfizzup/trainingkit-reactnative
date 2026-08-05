@@ -14,6 +14,7 @@ import WelcomeScreen from './src/screens/Welcome'
 import {ApolloClient, HttpLink, InMemoryCache} from "@apollo/client";
 import {ApolloProvider} from "@apollo/client/react";
 import {deviceIdentifier} from 'trainingkit-reactnative'
+import {graphqlConfig} from './src/config/graphql.generated'
 
 export type RootStackParamList = {
     Welcome: undefined
@@ -28,8 +29,9 @@ function App() {
     // Initialize Apollo Client
     const client = new ApolloClient({
         link: new HttpLink({
-            uri: "https://cloud.demo.fizzup.com/graphql",
+            uri: graphqlConfig.serverUrl,
             headers: {
+                "X-Developer-Authorization-Key": graphqlConfig.authKey,
                 "X-TrainingKit-Device": deviceIdentifier(),
             },
         }),

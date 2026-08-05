@@ -3,7 +3,6 @@ package com.fysiki.trainingkitreactnative
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -13,7 +12,6 @@ import com.fizzup.trainingkit.fragments.GoFragment
 import com.fizzup.trainingkit.interfaces.TrainingKitInterface
 import com.fizzup.trainingkit.models.MusicPlaylist
 import com.fizzup.trainingkit.states.SaveWorkoutState
-import com.fizzup.trainingkit.utils.DeviceIdHelper
 import com.fizzup.trainingkit.utils.JWTVerificationException
 import com.fizzup.trainingkit.utils.Tracking
 import com.google.gson.Gson
@@ -28,8 +26,14 @@ class ClassicWorkoutActivity : AppCompatActivity(), TrainingKitInterface {
         supportActionBar?.hide()
 
         val view = android.widget.FrameLayout(this)
-        view.id = View.generateViewId()
+        view.id = R.id.training_kit_classic_workout_container
         setContentView(view)
+
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = systemBars.bottom)
+            insets
+        }
 
         val jsonString = intent.getStringExtra("jsonString")
         val token = intent.getStringExtra("token")
@@ -43,32 +47,12 @@ class ClassicWorkoutActivity : AppCompatActivity(), TrainingKitInterface {
         try {
             val data = JSONObject(jsonString)
             val config = JSONObject()
-            val deviceId = DeviceIdHelper.getDeviceId(this)
 
-            val fragment = GoFragment.newInstance(data, config, token, deviceId)
+            val fragment = GoFragment.newInstance(data, config, token)
 
-            if (fragment != null) {
-                supportFragmentManager.beginTransaction()
-                    .replace(view.id, fragment)
-                    .commit()
-
-                fragment.viewLifecycleOwnerLiveData.observe(this) { owner ->
-                    owner?.lifecycle?.addObserver(object : androidx.lifecycle.DefaultLifecycleObserver {
-                        override fun onCreate(owner: androidx.lifecycle.LifecycleOwner) {
-                            fragment.view?.let { fragmentView ->
-                                ViewCompat.setOnApplyWindowInsetsListener(fragmentView) { v, insets ->
-                                    val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                                    v.updatePadding(bottom = systemBars.bottom)
-                                    insets
-                                }
-                            }
-                        }
-                    })
-                }
-            } else {
-                Log.e(TAG, "Failed to create fragment")
-                finish()
-            }
+            supportFragmentManager.beginTransaction()
+                .replace(view.id, fragment)
+                .commit()
         } catch (exception: Exception) {
             Log.e(TAG, "Error parsing data", exception)
             finish()
