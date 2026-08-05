@@ -25,6 +25,7 @@ class ClassicWorkoutActivity : AppCompatActivity(), TrainingKitInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
 
         val view = android.widget.FrameLayout(this)
         view.id = View.generateViewId()
