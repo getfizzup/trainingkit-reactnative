@@ -45,14 +45,15 @@ class ClassicWorkoutActivity : AppCompatActivity(), TrainingKitInterface {
         }
 
         try {
-            val data = JSONObject(jsonString)
-            val config = JSONObject()
+            if (savedInstanceState == null) {
+                val data = JSONObject(jsonString)
+                val config = JSONObject()
+                val fragment = GoFragment.newInstance(data, config, token)
 
-            val fragment = GoFragment.newInstance(data, config, token)
-
-            supportFragmentManager.beginTransaction()
-                .replace(view.id, fragment)
-                .commit()
+                supportFragmentManager.beginTransaction()
+                    .replace(view.id, fragment)
+                    .commit()
+            }
         } catch (exception: Exception) {
             Log.e(TAG, "Error parsing data", exception)
             finish()
